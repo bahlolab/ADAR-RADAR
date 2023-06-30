@@ -1,4 +1,4 @@
-# ADAR-radar
+# ADAR-RADAR
 Nextflow pipeline for detection, annotation and analysis of RNA editing
 
 *This pipeline is under construction - watch this space for updates.*
