@@ -5,7 +5,7 @@
 
 // import modules
 include { JACUSA_HELPER } from '../modules/local/jacusa_helper.nf'
-
+include { EXCLUDE_DBSNP } from '../modules/local/exclude_dbsnp.nf'
 /* 
 input manifest spec:
     - required columns "sample",  "seqtype", "filetype", "filename"
@@ -29,10 +29,15 @@ worflow steps:
         - UCSC repeats
     - ...
 */
+
+dbsnp = Channel.fromPath("$projectDir/resources/dbSNP_loci.tsv.gz", checkIfExists:true)
+
 workflow ADARRADAR {
     jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
 
     jacusa_results \
         | JACUSA_HELPER \
+        | combine(dbsnp)
+        | EXCLUDE_DBSNP \
         | view
 }
