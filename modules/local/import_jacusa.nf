@@ -1,5 +1,5 @@
 
-process JACUSA_HELPER {
+process IMPORT_JACUSA {
     cpus    1
     memory '4 GB'
     time   '1 h'
@@ -15,6 +15,6 @@ process JACUSA_HELPER {
     script:
     jacusa_table = "${id}.jacusa_table.tsv.gz"
     """
-    jacusa_helper.R $id $jacusa_output
+    import_jacusa.R $id $jacusa_output
     """
 }

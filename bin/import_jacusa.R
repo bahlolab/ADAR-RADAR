@@ -2,6 +2,8 @@
 require(JacusaHelper)
 require(tidyverse)
 
+altCount_thresh <- 3 #minimum detection filter: read depth for alternate (i.e., edited) allele
+DP_thresh     <- 10  #minimum detection filter: total read depth across candidate edited site
 # Based on code written by Simon N Thomas (UROP student)
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -49,7 +51,13 @@ res <-
       basechange = baseChange,
       flagINFO = filter_info,
     )
-  )
+  )  %>% 
+  filter(nchar(basechange) == 4) %>% 
+  filter(flagINFO == "*") %>%
+  filter(altcount >= altCount_thresh) %>%
+  mutate(totalDP = altcount * (1 / altprop)) %>%
+  filter(totalDP >= DP_thresh) %>%
+  mutate(siteID = paste(region, position, sep = "_"))
 
 write_tsv(res, str_c(sample, '.jacusa_table.tsv.gz'))
 

@@ -2,10 +2,10 @@
 // run checks etc here
 
 // import subworkflows
+include { AGGREGATE_01 } from '../subworkflows/local/aggregate_01.nf'
 
 // import modules
-include { JACUSA_HELPER } from '../modules/local/jacusa_helper.nf'
-include { EXCLUDE_DBSNP } from '../modules/local/exclude_dbsnp.nf'
+
 /* 
 input manifest spec:
     - required columns "sample",  "seqtype", "filetype", "filename"
@@ -30,14 +30,10 @@ worflow steps:
     - ...
 */
 
-dbsnp = Channel.fromPath("$projectDir/resources/dbSNP_loci.tsv.gz", checkIfExists:true)
-
 workflow ADARRADAR {
+
     jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
 
-    jacusa_results \
-        | JACUSA_HELPER \
-        | combine(dbsnp)
-        | EXCLUDE_DBSNP \
-        | view
+    AGGREGATE_01(jacusa_results)
 }
+
