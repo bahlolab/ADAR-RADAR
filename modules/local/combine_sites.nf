@@ -9,8 +9,8 @@ process COMBINE_SITES {
     path(jacusa_tables)
 
     output:
-    path "${params.name}.stranded_edSites.bed", emit: edsites_bed
-    path "${params.name}.res_other.rds", emit: res_other
+    path "${params.name}.stranded_edSites.bed",  emit: edsites_bed
+    path "${params.name}.res_other.rds",         emit: res_other
     path "${params.name}.nSamp_site_counts.rds", emit: samp_site_counts
 
     script:
