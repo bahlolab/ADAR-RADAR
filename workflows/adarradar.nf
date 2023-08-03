@@ -35,5 +35,12 @@ workflow ADARRADAR {
     jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
 
     AGGREGATE_01(jacusa_results)
+
+    // AGGREGATE_01.out.res_other.view()
+    // AGGREGATE_01.out.samp_site_counts.view()
+    // AGGREGATE_01.out.sites_redi_join.view()
+    // AGGREGATE_01.out.bounding_ensg.view()
+    // AGGREGATE_01.out.gen_features_intersect.view()
+    // AGGREGATE_01.out.rm_repeats_intersect.view()
 }
 

@@ -13,9 +13,7 @@ process INTERSECT_SITES {
 
 
     output:
-    path gene_isec,    emit: gene_isec
-    path pc_gene_isec, emit: pc_gene_isec
-    path repeat_isec,  emit: repeat_isec
+    tuple path(gene_isec), path(pc_gene_isec), path(repeat_isec)
 
     script:
     gene_isec    = "${params.name}.gene_isec.bed.gz"
