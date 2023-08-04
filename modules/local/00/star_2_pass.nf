@@ -1,7 +1,7 @@
 
 process STAR_2_PASS {
-    cpus    4
-    memory '8 GB'
+    cpus    8
+    memory '40 GB'
     time   '4 h'
     module 'STAR/2.6.1c'
 
@@ -20,7 +20,6 @@ process STAR_2_PASS {
         --runThreadN $task.cpus \\
         --genomeDir $star_genome_dir \\
         --sjdbGTFfile $star_gtf \\
-        --sjdbOverhang 149 \\
         --readFilesIn $fastq1 $fastq2  \\
         --readFilesCommand zcat \\
         --outFileNamePrefix ${sample}. \\

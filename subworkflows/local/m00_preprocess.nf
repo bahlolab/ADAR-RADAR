@@ -5,8 +5,8 @@ include { JACUSA       } from '../../modules/local/00/jacusa.nf'
 
 // TBD: replace with new
 ref_genome      = Channel.fromPath("$projectDir/resources/Homo_sapiens_assembly38.fasta", checkIfExists:true).first()
-star_genome_dir = Channel.fromPath("$projectDir/resources/star-genome-hg38", checkIfExists:true).first()
-star_gtf        = Channel.fromPath("$projectDir/resources/gencode.v43.annotation.gtf.gz", checkIfExists:true).first()
+star_genome_dir = Channel.fromPath("$projectDir/resources/star-index-hg38", checkIfExists:true).first()
+star_gtf        = Channel.fromPath("$projectDir/resources/gencode.v43.annotation.gtf", checkIfExists:true).first()
 jacus_jar       = Channel.fromPath("$projectDir/resources/JACUSA_v1.3.5.jar", checkIfExists:true).first()
 
 workflow M00_PREPROCESS {
