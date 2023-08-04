@@ -59,6 +59,6 @@ res <-
   filter(totalDP >= DP_thresh) %>%
   mutate(siteID = paste(region, position, sep = "_"))
 
-write_tsv(res, str_c(sample, '.jacusa_table.tsv.gz'))
+saveRDS(res, str_c(sample, '.jacusa_table.rds'))
 
 

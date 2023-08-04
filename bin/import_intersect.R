@@ -68,7 +68,7 @@ genFeatures_intersect <-
   )
 
 saveRDS(
-  boundingENSG,
+  genFeatures_intersect,
   str_c(name, ".genFeatures_intersect.rds")
 )
 

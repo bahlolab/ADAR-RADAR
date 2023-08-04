@@ -13,7 +13,7 @@ process EXCLUDE_DBSNP {
     tuple val(id), val(meta), path(jacusa_table_flt)
 
     script:
-    jacusa_table_flt = "${id}.jacusa_table.dbSNP_filt.tsv.gz"
+    jacusa_table_flt = "${id}.jacusa_table.dbSNP_filt.rds"
     """
     exclude_dbsnp.R $id $jacusa_table $dbsnp
     """

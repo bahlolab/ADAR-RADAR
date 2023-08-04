@@ -8,9 +8,7 @@ sample <- args[1]
 jacusa_table_fn <- args[2]
 dbSNP_loci_fn <- args[3]
 
-jacusa_table <- read_tsv(
-  jacusa_table_fn,
-  col_types = cols(position = col_integer()))
+jacusa_table <- readRDS(jacusa_table_fn)
 
 dbSNP_loci <- read_tsv(
   dbSNP_loci_fn, 
@@ -19,4 +17,4 @@ dbSNP_loci <- read_tsv(
 
 res <- anti_join(jacusa_table, dbSNP_loci, by = c('region', 'position'))
 
-write_tsv(res, str_c(sample, '.jacusa_table.dbSNP_filt.tsv.gz'))
+saveRDS(res, str_c(sample, '.jacusa_table.dbSNP_filt.rds'))

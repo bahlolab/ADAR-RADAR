@@ -7,12 +7,11 @@ name <- args[1]
 redi_counts <- args[2]
 jacusa_tables <- args[3:length(args)]
 
-sample_thresh <- 10  #minimum detection filter: n. samples (donors) in which edited site must be detected
+sample_thresh <- 10 # minimum detection filter: n. samples (donors) in which edited site must be detected
 
-res_other <-
-  map_df(jacusa_tables, read_tsv, col_types = cols())
+res_other <- map_df(jacusa_tables, readRDS)
 # moved to jacusa_helper
-# filter(nchar(basechange) == 4) %>% 
+# filter(nchar(basechange) == 4) %>%
 # filter(flagINFO == "*") %>%
 # filter(altcount >= altCount_thresh) %>%
 # mutate(siteID = paste(region, position, sep = "_")) %>%
@@ -23,6 +22,26 @@ saveRDS(
   res_other,
   str_c(name, ".res_other.rds")
 )
+
+all_siteStats <-
+  res_other %>%
+  # filter(siteID %in% (nSamp_site_counts %>% filter(n>=3) %>% pull(siteID))) %>%
+  filter(basechange %in% c("A->G")) %>% # stranded data
+  # filter(basechange %in% c('A->G','T->C')) %>%  #unstranded data
+  group_by(siteID, basechange, strand) %>% # stranded
+  # group_by(siteID,basechange) %>%  #unstranded
+  summarize(
+    meanAP = mean(altprop), medianAP = median(altprop), sdAP = sd(altprop),
+    meanAD = mean(altcount), medianAD = median(altcount), sdAD = sd(altcount),
+    nSamples = n()
+  ) %>% ungroup()
+
+saveRDS(
+  all_siteStats,
+  str_c(name, ".all_siteStats.rds")
+)
+
+
 
 nSamp_site_counts <-
   res_other %>%
@@ -52,9 +71,9 @@ write_tsv(
 siteStats_rediJOIN <-
   res_other %>%
   semi_join(
-    filter(nSamp_site_counts , n>=sample_thresh),
-    by = 'siteID'
-  ) %>% 
+    filter(nSamp_site_counts, n >= sample_thresh),
+    by = "siteID"
+  ) %>%
   filter(
     basechange %in% c("A->G")
   ) %>% # stranded data
@@ -73,27 +92,18 @@ siteStats_rediJOIN <-
   ungroup() %>%
   distinct() %>%
   left_join(
-    readRDS(redi_counts), 
+    readRDS(redi_counts),
     by = "siteID"
   ) %>%
   group_by(
     siteID
   ) %>%
   filter(
-    !(n()>1 & is.na(chromosome))
-  ) %>% 
+    !(n() > 1 & is.na(chromosome))
+  ) %>%
   ungroup()
 
 saveRDS(
   siteStats_rediJOIN,
   str_c(name, ".siteStats_rediJOIN.rds")
 )
-
-
-
-
-
-
-
-
-

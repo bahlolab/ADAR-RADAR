@@ -2,7 +2,9 @@
 // run checks etc here
 
 // import subworkflows
-include { AGGREGATE_01 } from '../subworkflows/local/aggregate_01.nf'
+include { M00_PREPROCESS } from '../subworkflows/local/m00_preprocess.nf'
+include { M01_AGGREGATE  } from '../subworkflows/local/m01_aggregate.nf'
+include { M02_INTERSECT  } from '../subworkflows/local/m02_intersect.nf'
 
 // import modules
 
@@ -12,9 +14,12 @@ input manifest spec:
         - eg "sample1", "stranded", "fastq1", "/path/to/file.fastq_R1.gz"
     - optional columns "replicate", "group"
 */
+// input = WfAdarRadar
+//     .read_csv(file(params.input), required: ['sample', 'filename'])
+//     .collect { it + [file: file(it.filename, checkIfExists: true)] }
+
 input = WfAdarRadar
-    .read_csv(file(params.input), required: ['sample', 'filename'])
-    .collect { it + [file: file(it.filename, checkIfExists: true)] }
+    .read_csv(file(params.input), required: ['sample', 'fastq1', 'fastq2'])
 /*
 worflow steps:
     - STAR align (FE_star2pass.sh)
@@ -32,15 +37,27 @@ worflow steps:
 
 workflow ADARRADAR {
 
-    jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
+    // jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
+    fastqs = Channel
+        .fromList(input)
+        .map { [it.sample, file(it.fastq1, checkIfExists: true), file(it.fastq2, checkIfExists: true)] }
 
-    AGGREGATE_01(jacusa_results)
+    M00_PREPROCESS(
+        fastqs
+    )
 
-    // AGGREGATE_01.out.res_other.view()
-    // AGGREGATE_01.out.samp_site_counts.view()
-    // AGGREGATE_01.out.sites_redi_join.view()
-    // AGGREGATE_01.out.bounding_ensg.view()
-    // AGGREGATE_01.out.gen_features_intersect.view()
-    // AGGREGATE_01.out.rm_repeats_intersect.view()
+    // M01_AGGREGATE(
+    //     jacusa_results
+    // )
+
+    // M02_INTERSECT(
+    //     M01_AGGREGATE.out.res_other,
+    //     M01_AGGREGATE.out.samp_site_counts,
+    //     M01_AGGREGATE.out.sites_redi_join,
+    //     M01_AGGREGATE.out.all_site_stats,
+    //     M01_AGGREGATE.out.bounding_ensg,
+    //     M01_AGGREGATE.out.gen_features_intersect,
+    //     M01_AGGREGATE.out.rm_repeats_intersect
+    // )
 }
 

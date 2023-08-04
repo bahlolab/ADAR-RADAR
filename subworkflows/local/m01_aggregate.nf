@@ -12,7 +12,7 @@ pc_genes     = Channel.fromPath("$projectDir/resources/Homo_sapiens_ProteinCodin
 ucsc_repeats = Channel.fromPath("$projectDir/resources/UCSC_Repeats_reformat.bed.gz", checkIfExists:true).first()
 redi_counts  = Channel.fromPath("$projectDir/resources/REDI_gtex_counts.rds", checkIfExists:true).first()
 
-workflow AGGREGATE_01 {
+workflow M01_AGGREGATE {
     take: 
     jacusa_results
     
@@ -37,12 +37,13 @@ workflow AGGREGATE_01 {
         | IMPORT_INTERSECT
 
     emit:
-        // edsites_bed            = COMBINE_SITES.out.edsites_bed
-        res_other              = COMBINE_SITES.out.res_other
-        samp_site_counts       = COMBINE_SITES.out.samp_site_counts
-        sites_redi_join        = COMBINE_SITES.out.sites_redi_join
-        bounding_ensg          = IMPORT_INTERSECT.out.bounding_ensg
-        gen_features_intersect = IMPORT_INTERSECT.out.gen_features_intersect
-        rm_repeats_intersect   = IMPORT_INTERSECT.out.rm_repeats_intersect
+    // edsites_bed            = COMBINE_SITES.out.edsites_bed
+    res_other              = COMBINE_SITES.out.res_other
+    samp_site_counts       = COMBINE_SITES.out.samp_site_counts
+    sites_redi_join        = COMBINE_SITES.out.sites_redi_join
+    all_site_stats         = COMBINE_SITES.out.all_site_stats
+    bounding_ensg          = IMPORT_INTERSECT.out.bounding_ensg
+    gen_features_intersect = IMPORT_INTERSECT.out.gen_features_intersect
+    rm_repeats_intersect   = IMPORT_INTERSECT.out.rm_repeats_intersect
     
 }

@@ -13,7 +13,7 @@ process IMPORT_JACUSA {
     tuple val(id), val(meta), path(jacusa_table)
 
     script:
-    jacusa_table = "${id}.jacusa_table.tsv.gz"
+    jacusa_table = "${id}.jacusa_table.rds"
     """
     import_jacusa.R $id $jacusa_output
     """
