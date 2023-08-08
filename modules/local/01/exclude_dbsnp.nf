@@ -7,10 +7,10 @@ process EXCLUDE_DBSNP {
     tag "$id"
 
     input:
-    tuple val(id), val(meta), path(jacusa_table), path(dbsnp)
+    tuple val(id), path(jacusa_table), path(dbsnp)
 
     output:
-    tuple val(id), val(meta), path(jacusa_table_flt)
+    tuple val(id), path(jacusa_table_flt)
 
     script:
     jacusa_table_flt = "${id}.jacusa_table.dbSNP_filt.rds"

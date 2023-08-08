@@ -7,10 +7,10 @@ process IMPORT_JACUSA {
     tag "$id"
 
     input:
-    tuple val(id), val(meta), path(jacusa_output)
+    tuple val(id), path(jacusa_output)
 
     output:
-    tuple val(id), val(meta), path(jacusa_table)
+    tuple val(id), path(jacusa_table)
 
     script:
     jacusa_table = "${id}.jacusa_table.rds"

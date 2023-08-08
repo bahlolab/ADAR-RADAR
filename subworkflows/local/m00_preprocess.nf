@@ -31,5 +31,5 @@ workflow M00_PREPROCESS {
     )
 
     emit:
-    JACUSA.out
+    jacusa_results = JACUSA.out
 }

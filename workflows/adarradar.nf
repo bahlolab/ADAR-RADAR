@@ -46,18 +46,18 @@ workflow ADARRADAR {
         fastqs
     )
 
-    // M01_AGGREGATE(
-    //     jacusa_results
-    // )
+    M01_AGGREGATE(
+        M00_PREPROCESS.out.jacusa_results
+    )
 
-    // M02_INTERSECT(
-    //     M01_AGGREGATE.out.res_other,
-    //     M01_AGGREGATE.out.samp_site_counts,
-    //     M01_AGGREGATE.out.sites_redi_join,
-    //     M01_AGGREGATE.out.all_site_stats,
-    //     M01_AGGREGATE.out.bounding_ensg,
-    //     M01_AGGREGATE.out.gen_features_intersect,
-    //     M01_AGGREGATE.out.rm_repeats_intersect
-    // )
+    M02_INTERSECT(
+        M01_AGGREGATE.out.res_other,
+        M01_AGGREGATE.out.samp_site_counts,
+        M01_AGGREGATE.out.sites_redi_join,
+        M01_AGGREGATE.out.all_site_stats,
+        M01_AGGREGATE.out.bounding_ensg,
+        M01_AGGREGATE.out.gen_features_intersect,
+        M01_AGGREGATE.out.rm_repeats_intersect
+    )
 }
 

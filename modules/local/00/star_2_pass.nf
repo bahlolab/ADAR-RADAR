@@ -11,7 +11,7 @@ process STAR_2_PASS {
     path star_gtf
 
     output:
-    tuple val(sample), path(fastq1), path(fastq2)
+    tuple val(sample), path(bam)
 
     script:
     bam = "${sample}.Aligned.sortedByCoord.out.bam"
