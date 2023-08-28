@@ -12,6 +12,7 @@ jacus_jar       = Channel.fromPath("$projectDir/resources/JACUSA_v1.3.5.jar", ch
 workflow M00_PREPROCESS {
     take: 
     fastqs
+    bams
     
     main:
     STAR_2_PASS(
@@ -25,11 +26,43 @@ workflow M00_PREPROCESS {
         ref_genome
     )
 
+    bams_mix = bams.mix(MARK_DUPS.out)
+
     JACUSA(
-        MARK_DUPS.out,
+        bams_mix,
         jacus_jar
     )
 
+    bamdir = file("${params.outdir}/bam").toRealPath()
+    // create bam manifest
+    MARK_DUPS.out
+        .map { sm, bam, bai -> 
+            "$sm,$bamdir/${bam.fileName}"
+        }.collectFile(
+            seed:     'sample,bam',
+            name:     "${params.name}.bams.csv",
+            storeDir: params.outdir,
+            newLine:  true,
+            sort:     true, 
+            cache:    false
+        )
+
+
+    // create jacusa manifest
+    jacusadir = file("${params.outdir}/jacusa").toRealPath()
+    JACUSA.out
+        .map { 
+            sm, out -> "$sm,$jacusadir/${out.fileName}" 
+        }.collectFile(
+            seed:     'sample,jacusa',
+            name:     "${params.name}.jacusa.csv",
+            storeDir: params.outdir,
+            newLine:  true,
+            sort:     true, 
+            cache:    false
+        )
+
     emit:
     jacusa_results = JACUSA.out
+    bams           = bams_mix
 }

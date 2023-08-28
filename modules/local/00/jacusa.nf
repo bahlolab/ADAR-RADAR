@@ -1,10 +1,10 @@
 
 process JACUSA {
-    cpus    2
+    cpus    4
     memory '16 GB'
-    time   '8 h'
+    time   '16 h'
     module 'java/1.8.0_211'
-
+    publishDir "${params.outdir}/jacusa", mode: 'copy'
 
     input:
     tuple val(sample), path(bam), path(bai)
