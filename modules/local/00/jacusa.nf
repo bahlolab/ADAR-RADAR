@@ -5,6 +5,7 @@ process JACUSA {
     time   '16 h'
     module 'java/1.8.0_211'
     publishDir "${params.outdir}/jacusa", mode: 'copy'
+    tag "$sample"
 
     input:
     tuple val(sample), path(bam), path(bai)

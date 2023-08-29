@@ -6,6 +6,7 @@ process MARK_DUPS {
     module 'samtools/1.17'
     module 'picard-tools/2.26.11'
     publishDir "${params.outdir}/bam", mode: 'copy'
+    tag "$sample"
 
     input:
     tuple val(sample), path(in_bam)

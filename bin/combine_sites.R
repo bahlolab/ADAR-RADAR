@@ -7,7 +7,8 @@ name <- args[1]
 redi_counts <- args[2]
 jacusa_tables <- args[3:length(args)]
 
-sample_thresh <- 10 # minimum detection filter: n. samples (donors) in which edited site must be detected
+# TODO - update to frequency + count for applicability to small batches
+sample_thresh <- 5 # minimum detection filter: n. samples (donors) in which edited site must be detected
 
 res_other <- map_df(jacusa_tables, readRDS)
 # moved to jacusa_helper
@@ -60,12 +61,13 @@ forSamDepth <-
   distinct() %>%
   separate(siteID, into = c("chr", "pos"), convert = TRUE, sep = "_") %>%
   mutate(pos = as.numeric(pos), start = pos - 1) %>%
-  select(chr, start, pos)
+  select(chr, start, pos) %>%
+  na.omit()
 
 write_tsv(
   forSamDepth,
   col_names = FALSE,
-  file = paste0(name, ".stranded_edSites.bed")
+  file = paste0(name, ".stranded_edSites.bed.gz")
 )
 
 siteStats_rediJOIN <-

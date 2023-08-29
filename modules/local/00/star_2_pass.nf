@@ -4,6 +4,7 @@ process STAR_2_PASS {
     memory '40 GB'
     time   '4 h'
     module 'STAR/2.6.1c'
+    tag "$sample"
 
     input:
     tuple val(sample), path(fastq1), path(fastq2)

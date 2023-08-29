@@ -1,6 +1,6 @@
 
 include { IMPORT_JACUSA    } from '../../modules/local/01/import_jacusa.nf'
-include { EXCLUDE_DBSNP    } from '../../modules/local/01/exclude_dbsnp.nf'
+// include { EXCLUDE_DBSNP    } from '../../modules/local/01/exclude_dbsnp.nf'
 include { COMBINE_SITES    } from '../../modules/local/01/combine_sites.nf'
 include { INTERSECT_SITES  } from '../../modules/local/01/intersect_sites.nf'
 include { IMPORT_INTERSECT } from '../../modules/local/01/import_intersect.nf'
@@ -18,10 +18,11 @@ workflow M01_AGGREGATE {
     
     main:
     jacusa_tables = jacusa_results
-        | IMPORT_JACUSA
         | combine(dbsnp)
-        | EXCLUDE_DBSNP
-        | map { it[2] }
+        | IMPORT_JACUSA
+        // | combine(dbsnp)
+        // | EXCLUDE_DBSNP
+        | map { it[1] }
         | collect
 
     COMBINE_SITES(
