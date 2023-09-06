@@ -38,7 +38,6 @@ workflow M01_AGGREGATE {
         | IMPORT_INTERSECT
 
     emit:
-    // edsites_bed            = COMBINE_SITES.out.edsites_bed
     res_other              = COMBINE_SITES.out.res_other
     samp_site_counts       = COMBINE_SITES.out.samp_site_counts
     sites_redi_join        = COMBINE_SITES.out.sites_redi_join

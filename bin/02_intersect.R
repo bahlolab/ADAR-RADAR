@@ -2,7 +2,11 @@
 
 require(tidyverse)
 
-sample_thresh <- 10 # minimum detection filter: n. samples (donors) in which edited site must be detected
+# TODO - update to frequency + count for applicability to small batches
+sample_thresh <- 5 # minimum detection filter: n. samples (donors) in which edited site must be detected
+# replace 'chr' prefix to hg38 chromosome names
+replace_chr <- TRUE
+
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -220,10 +224,11 @@ filt_forSamDepth <-
   separate(siteID, into = c("chr", "pos"), convert = TRUE, sep = "_") %>%
   mutate(pos = as.numeric(pos), start = pos - 1) %>%
   select(chr, start, pos) %>% 
+  mutate(chr = `if`(replace_chr, str_c('chr', chr), chr)) %>% 
   arrange_all()
 
 write_tsv(
   filt_forSamDepth,
   col_names = FALSE,
-  file = str_c(name, ".sites_filt.bed")
+  file = str_c(name, ".sites_filt.bed.gz")
 )

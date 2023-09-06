@@ -25,6 +25,8 @@ workflow M02_INTERSECT {
     )
 
     emit:
-    null
+    sites_tagged_context = INTERSECT.out.sites_tagged_context
+    sites_stats_filt     = INTERSECT.out.sites_stats_filt
+    sites_filt_bed       = INTERSECT.out.sites_filt_bed
     
 }

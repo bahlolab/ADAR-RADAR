@@ -19,6 +19,6 @@ process IMPORT_INTERSECT {
     gen_features_intersect  = "${params.name}.genFeatures_intersect.rds"
     rm_repeats_intersect    = "${params.name}.RM_Repeats_intersect.rds"
     """
-    import_intersect.R $params.name $gene_isec $pc_gene_isec $repeat_isec
+    01_import_intersect.R $params.name $gene_isec $pc_gene_isec $repeat_isec
     """
 }

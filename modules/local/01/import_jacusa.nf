@@ -15,6 +15,6 @@ process IMPORT_JACUSA {
     script:
     jacusa_table = "${id}.jacusa_table.rds"
     """
-    import_jacusa.R $id $jacusa_output $dbsnp
+    01_import_jacusa.R $id $jacusa_output $dbsnp
     """
 }

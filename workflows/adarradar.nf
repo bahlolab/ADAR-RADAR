@@ -5,6 +5,7 @@
 include { M00_PREPROCESS } from '../subworkflows/local/m00_preprocess.nf'
 include { M01_AGGREGATE  } from '../subworkflows/local/m01_aggregate.nf'
 include { M02_INTERSECT  } from '../subworkflows/local/m02_intersect.nf'
+include { M03_SAMDEPTH   } from '../subworkflows/local/m03_samdepth.nf'
 
 // TODO: check 1 row per sample
 // TODO: check has bam if has jacusa
@@ -61,8 +62,13 @@ workflow ADARRADAR {
         M01_AGGREGATE.out.rm_repeats_intersect
     )
 
-    //TBD
-    bams_depth = bams_with_jacusa.mix(M00_PREPROCESS.out.bams)
+    M03_SAMDEPTH(
+        bams_with_jacusa.mix(M00_PREPROCESS.out.bams),
+        M01_AGGREGATE.out.res_other,
+        M02_INTERSECT.out.sites_tagged_context,
+        M02_INTERSECT.out.sites_stats_filt,
+        M02_INTERSECT.out.sites_filt_bed
+    )
 
 }
 

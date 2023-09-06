@@ -15,7 +15,7 @@ process INTERSECT {
     output:
     path "${params.name}.sites_tagged_context.rds", emit: sites_tagged_context
     path "${params.name}.siteStats_filt.rds",       emit: sites_stats_filt
-    path "${params.name}.sites_filt.bed",           emit: sites_filt_bed
+    path "${params.name}.sites_filt.bed.gz",        emit: sites_filt_bed
 
     script:
     """
