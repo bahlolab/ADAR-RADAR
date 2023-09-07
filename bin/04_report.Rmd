@@ -1,0 +1,130 @@
+---
+title: "ADAR-RADAR report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+
+require(tidverse)
+
+
+my_datatable <- function(data) {
+  DT::datatable(
+    data,
+    rownames = FALSE,
+    escape = FALSE,
+    filter = 'top',
+    extensions = 'Buttons',
+    options = list(
+      dom = 'rtipB',
+      buttons = list(
+        list(extend = 'csv',  filename=deparse(substitute(data))),
+        list(extend = 'excel',  filename=deparse(substitute(data)), title='')
+      ),
+      initComplete = htmlwidgets::JS(
+        "function(settings, json) {",
+        "$('body').css({'font-family': 'Helvetica'});",
+        "}"
+      )))
+}
+```
+
+## Basechange QC metrics
+
+
+```{r}
+# res_other <- readRDS('/vast/scratch/users/munro.j/nextflow/work/f1/f0754ae9d82d62786b905d2653c53f/AR.res_other.rds')
+
+basechange_freq <-
+  res_other %>% 
+  select(region, position, basechange) %>% 
+  distinct() %>% 
+  count(basechange) %>% 
+  mutate(percent = round(100 * n / sum(n), 2))
+
+basechange_freq %>% 
+  mutate(
+    label = str_c(basechange, '\n', round(percent, 1), '%'),
+    ref_base = str_extract(basechange, '^[ACTG]'),
+    alt_base = str_extract(basechange, '[ACTG]$')) %>% 
+  ggplot(aes(alt_base, ref_base)) +
+  theme_minimal() +
+  theme(panel.grid = element_blank()) +
+  geom_tile(aes(fill = percent)) +
+  ggfittext::geom_fit_text(aes(label = label), contrast = T) +
+  scale_fill_viridis_c(trans = 'log1p') +
+  ggtitle('Detected RNA Basechange Frequencies',
+          subtitle = str_c(format(nrow(basechange_freq), big.mark = ','), ' sites'))
+
+my_datatable(basechange_freq)
+```
+
+```{r}
+is_outlier <- function(x) (x < quantile(x, 0.25) - 1.5 * IQR(x)) |  (x > quantile(x, 0.75) + 1.5 * IQR(x))
+
+sample_basechange <-
+  res_other %>% 
+  select(region, position, basechange, sample,) %>% 
+  distinct() %>% 
+  na.omit() %>% 
+  group_by(sample) %>%
+  summarise(n_sites = n(),
+            n_sites_AG = sum(basechange == 'A->G'),
+            percent_AG = round(100*n_sites_AG/n_sites,2),
+            .groups = 'drop') %>% 
+  # add_row(sample = 'outer', n_sites = 8000,n_sites_AG=2000, freq_AG = 0.25) %>%
+  mutate(outlier = is_outlier(percent_AG))
+
+sample_basechange %>% 
+  ggplot(aes(n_sites, n_sites_AG)) +
+  geom_smooth(method = 'lm',) +
+  geom_point(alpha = 0.5) +
+  geom_point(
+    data = filter(sample_basechange, outlier),
+    aes(col = outlier)) +
+  ggrepel::geom_text_repel(
+    data = filter(sample_basechange, outlier),
+    aes(label = sample)) +
+  labs(x = 'number of basechange sites',
+       y = 'number of A->G sites',
+       title = 'RNA basechange sites counts across samples')
+
+my_datatable(sample_basechange)
+```
+
+
+### Editing Site Context Summary
+```{r}
+# sites_tagged_context <- 
+#   readRDS(
+#     '/vast/scratch/users/munro.j/nextflow/work/45/003fa3241e9a2c4898c21106859882/AR.sites_tagged_context.rds'
+#   )
+
+sites_tagged_context %>%
+  group_by(basechange, REDI) %>%
+  count(strand, site_context) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup() %>%
+  mutate(fullSum = sum(n))  %>% #54K sites total
+  group_by(basechange, REDI) %>% 
+  mutate(propCont = n / sum(n)) %>%
+  mutate(site_context = factor(site_context, levels = c('non_cognate', 'ambiguous', 'cognate'))) %>%
+  ggplot(aes(x = REDI, y = n, fill = site_context)) + 
+  geom_col(position =  'stack') +
+  scale_fill_manual(values = c(non_cognate='grey', ambiguous='green4', cognate='green3')) +
+  facet_wrap( ~ basechange)
+
+sites_tagged_context %>% 
+  group_by(basechange) %>%
+  mutate(site_context = factor(site_context, levels = c('non_cognate', 'ambiguous', 'cognate'))) %>%
+  count(site_context) %>%
+  ggplot(aes(x = basechange, y = n, fill = site_context)) +
+  geom_col(position = 'fill') +
+  scale_fill_manual(values = c(non_cognate='grey', ambiguous='pink', cognate="#F8766D"))
+```
+

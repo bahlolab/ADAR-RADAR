@@ -12,15 +12,15 @@ remove_chr <- TRUE
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# name <- args[1]
-# siteStats_filt_fn <- args[2]
-# sam_depth_csv_fn <- args[3]
-# res_other_fn <- args[4]
+name <- args[1]
+siteStats_filt_fn <- args[2]
+sam_depth_csv_fn <- args[3]
+res_other_fn <- args[4]
 
-name <- 'AR'
-siteStats_filt_fn <- 'AR.siteStats_filt.rds'
-sam_depth_csv_fn <- 'sam_depth.csv'
-res_other_fn <- 'AR.res_other.rds'
+# name <- 'AR'
+# siteStats_filt_fn <- 'AR.siteStats_filt.rds'
+# sam_depth_csv_fn <- 'sam_depth.csv'
+# res_other_fn <- 'AR.res_other.rds'
 
 siteStats_filt <- readRDS(siteStats_filt_fn)
 # TODO - why are we filtering this way here? Does this need a strandedness swtich?

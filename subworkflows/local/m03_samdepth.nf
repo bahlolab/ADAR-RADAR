@@ -6,7 +6,6 @@ workflow M03_SAMDEPTH {
     take: 
     bams_depth
     res_other
-    sites_tagged_context
     sites_stats_filt
     sites_filt_bed
     
