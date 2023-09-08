@@ -2,20 +2,20 @@
 require(JacusaHelper)
 require(tidyverse)
 
-# minimum detection filter: read depth for alternate (i.e., edited) allele
-altCount_thresh <- 3
-# minimum detection filter: total read depth across candidate edited site
-DP_thresh <- 10
-# remove 'chr' prefix from hg38 coordinates
-remove_chr <- TRUE
+
 
 args <- commandArgs(trailingOnly = TRUE)
 sample <- args[1]
 jacusa_output <- args[2]
 dbSNP_loci_fn <- args[3]
+# minimum detection filter: read depth for alternate (i.e., edited) allele
+altCount_thresh <- as.integer(args[4])
+# minimum detection filter: total read depth across candidate edited site
+DP_thresh <- as.integer(args[5])
+# remove 'chr' prefix from hg38 coordinates
+remove_chr <- as.logical(args[6])
 
 # Based on code written by Simon N Thomas (UROP student)
-
 
 res <-
   JacusaHelper::Read(jacusa_output, stat = 1.56, cov = 5) %>%

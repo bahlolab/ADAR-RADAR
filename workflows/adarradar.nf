@@ -37,11 +37,6 @@ jacusa_results = Channel
 
 workflow ADARRADAR {
 
-    // jacusa_results = Channel.fromList(input).map { [it.sample, [:], it.file] }
-    // fastqs = Channel
-    //     .fromList(input)
-    //     .map { [it.sample, file(it.fastq1, checkIfExists: true), file(it.fastq2, checkIfExists: true)] }
-
     M00_PREPROCESS(
         fastqs,
         bams_no_jacusa

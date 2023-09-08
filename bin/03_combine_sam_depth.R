@@ -2,25 +2,16 @@
 
 require(tidyverse)
 
-# minimum detection filter: total read depth across candidate edited site
-DP_thresh <- 10
-# minimum detection filter: read depth for alternate (i.e., edited) allele
-altCount_thresh <- 3
-# remove 'chr' prefix from hg38 coordinates
-remove_chr <- TRUE
-
-
 args <- commandArgs(trailingOnly = TRUE)
 
 name <- args[1]
 siteStats_filt_fn <- args[2]
 sam_depth_csv_fn <- args[3]
 res_other_fn <- args[4]
+DP_thresh <- as.integer(args[5])
+altCount_thresh <- as.integer(args[6])
+remove_chr <- as.logical(args[7])
 
-# name <- 'AR'
-# siteStats_filt_fn <- 'AR.siteStats_filt.rds'
-# sam_depth_csv_fn <- 'sam_depth.csv'
-# res_other_fn <- 'AR.res_other.rds'
 
 siteStats_filt <- readRDS(siteStats_filt_fn)
 # TODO - why are we filtering this way here? Does this need a strandedness swtich?

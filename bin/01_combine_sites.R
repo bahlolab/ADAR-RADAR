@@ -6,9 +6,8 @@ args <- commandArgs(trailingOnly = TRUE)
 name <- args[1]
 redi_counts <- args[2]
 jacusa_tables <- args[3:length(args)]
-
 # TODO - update to frequency + count for applicability to small batches
-sample_thresh <- 5 # minimum detection filter: n. samples (donors) in which edited site must be detected
+sample_thresh <- as.integer(args[4])
 
 res_other <- map_df(jacusa_tables, readRDS)
 # moved to jacusa_helper

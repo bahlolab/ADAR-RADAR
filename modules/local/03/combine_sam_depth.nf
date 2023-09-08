@@ -17,9 +17,13 @@ process COMBINE_SAM_DEPTH {
 
     script:
     """
-    03_combine_sam_depth.R $params.name \\
+    03_combine_sam_depth.R \\
+        $params.name \\
         $sites_stats_filt \\
         $sam_depth_csv \\
-        $res_other
+        $res_other \\
+        $params.depth_thresh \\
+        $params.alt_count_thresh \\
+        $params.remove_chr
     """
 }

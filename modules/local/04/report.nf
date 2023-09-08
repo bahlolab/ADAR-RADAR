@@ -19,7 +19,8 @@ process REPORT {
     script:
     """
     if [[ -L "$rmd" ]]; then cp --remove-destination `readlink $rmd` $rmd; fi
-    04_report.R $params.name \\
+    04_report.R \\
+        $params.name \\
         $res_other \\
         $sites_tagged_context \\
         $sites_stats_filt \\

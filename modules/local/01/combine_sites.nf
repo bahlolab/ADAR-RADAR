@@ -19,6 +19,10 @@ process COMBINE_SITES {
 
     script:
     """
-    01_combine_sites.R $params.name $redi_counts $jacusa_tables
+    01_combine_sites.R \\
+        $params.name \\
+        $redi_counts \\
+        $jacusa_tables \\
+        $params.sample_thresh
     """
 }

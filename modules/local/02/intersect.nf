@@ -20,11 +20,14 @@ process INTERSECT {
 
     script:
     """
-    02_intersect.R $params.name \\
+    02_intersect.R \\
+        $params.name \\
         $sites_redi_join \\
         $bounding_ensg \\
         $rm_repeats_intersect \\
         $gen_features_intersect \\
-        $all_site_stats
+        $all_site_stats \\
+        $params.sample_thresh \\
+        $params.remove_chr
     """
 }

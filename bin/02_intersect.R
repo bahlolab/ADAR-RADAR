@@ -2,12 +2,6 @@
 
 require(tidyverse)
 
-# TODO - update to frequency + count for applicability to small batches
-sample_thresh <- 5 # minimum detection filter: n. samples (donors) in which edited site must be detected
-# replace 'chr' prefix to hg38 chromosome names
-replace_chr <- TRUE
-
-
 args <- commandArgs(trailingOnly = TRUE)
 
 name <- args[1]
@@ -15,7 +9,10 @@ siteStats_rediJOIN_fn <- args[2]
 boundingENSG_fn <- args[3]
 RM_Repeats_intersect_fn <- args[4]
 genFeatures_intersect_fn <- args[5]
-all_siteStats_fn         <- args[6]
+all_siteStats_fn <- args[6]
+sample_thresh <- as.integer(args[7])
+replace_chr <- as.logical(args[8])
+
 
 # res_other <- readRDS(res_other_fn)
 siteStats_rediJOIN <- readRDS(siteStats_rediJOIN_fn)

@@ -15,6 +15,9 @@ process EXCLUDE_DBSNP {
     script:
     jacusa_table_flt = "${id}.jacusa_table.dbSNP_filt.rds"
     """
-    01_exclude_dbsnp.R $id $jacusa_table $dbsnp
+    01_exclude_dbsnp.R \\
+        $id \\
+        $jacusa_table \\
+        $dbsnp
     """
 }
