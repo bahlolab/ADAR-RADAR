@@ -4,6 +4,7 @@ process IMPORT_INTERSECT {
     memory '4 GB'
     time   '1 h'
     label  'R'
+    publishDir "${params.outdir}/rds", pattern: '*.rds', mode: 'copy'
 
     input:
     tuple path(gene_isec), path(pc_gene_isec), path(repeat_isec)

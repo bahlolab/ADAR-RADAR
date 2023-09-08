@@ -97,6 +97,29 @@ sample_basechange %>%
 my_datatable(sample_basechange)
 ```
 
+```{r}
+# sample_site_depth <- readRDS('/vast/scratch/users/munro.j/nextflow/work/3e/5748a46c60bf80520039a6dbbb66ce/AR.sample_site_depth.rds')
+n_sites <- n_distinct(sample_site_depth$siteID)
+
+sample_site_smry <-
+  sample_site_depth %>% 
+  group_by(sample) %>% 
+  summarise(
+    mean_sam_depth = mean(samDepth),
+    mean_jac_depth = mean(totalDP),
+    call_rate = n()/n_sites) 
+
+sample_site_smry %>% 
+  ggplot(aes(mean_sam_depth, mean_jac_depth)) +
+  geom_abline() +
+  geom_point(aes(col = call_rate)) +
+  coord_fixed() +
+  scale_color_viridis_c(end = 0.85) +
+  ggtitle('JACUSA depth vs Sam Depth vs Call-Rate')
+# +
+  # scale_x_continuous(trans = 'log') +
+  # scale_y_continuous(trans = 'log')
+```
 
 ### Editing Site Context Summary
 ```{r}
@@ -127,4 +150,20 @@ sites_tagged_context %>%
   geom_col(position = 'fill') +
   scale_fill_manual(values = c(non_cognate='grey', ambiguous='pink', cognate="#F8766D"))
 ```
+
+```{r}
+# sites_stats_filt <-readRDS('/vast/scratch/users/munro.j/nextflow/work/45/003fa3241e9a2c4898c21106859882/AR.siteStats_filt.rds')
+
+sites_stats_filt %>%
+  filter(str_detect(site_status, 'single')) %>%
+  filter(ENSGbioType == 'protein_coding') %>%
+  count(REDI, RM_repType) %>%
+  mutate(prop = n / sum(n)) %>%
+  mutate(cs = cumsum(prop)) %>%
+  ggplot(aes(x = REDI, y = n, fill = RM_repType)) +
+  geom_col(position ='dodge') +
+  ggtitle('Repeat Masker type vs REDI annotation type')
+```
+
+
 

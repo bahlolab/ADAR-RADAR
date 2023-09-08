@@ -69,7 +69,6 @@ sample_site_depth <-
   mutate(altcount= if_else(is.na(altcount), 0, altcount),
          altprop = if_else(is.na(altprop),  0, altprop)) %>% 
   group_by(siteID) %>%
-  # TODO: understand what fill is doing here - looks to be filling in for samples that aren't present
   fill(strand, basechange, altbase, region, position, .direction = 'updown') %>% 
   ungroup() %>% 
   mutate(refcount = ifelse(altcount > 0,  (altcount * (1/altprop)) - altcount, samDepth)) %>% 

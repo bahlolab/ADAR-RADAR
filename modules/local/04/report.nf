@@ -10,16 +10,19 @@ process REPORT {
     path(rmd)
     path(res_other)
     path(sites_tagged_context)
+    path(sites_stats_filt)
+    path(sample_site_depth)
 
     output:
     path("${params.name}.report.html")
 
     script:
     """
-    cp --remove-destination `readlink $rmd` $rmd
+    if [[ -L "$rmd" ]]; then cp --remove-destination `readlink $rmd` $rmd; fi
     04_report.R $params.name \\
-        $rmd \\
         $res_other \\
-        $sites_tagged_context
+        $sites_tagged_context \\
+        $sites_stats_filt \\
+        $sample_site_depth
     """
 }

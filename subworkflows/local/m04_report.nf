@@ -25,7 +25,9 @@ workflow M04_REPORT {
     REPORT(
         report_rmd,
         res_other,
-        sites_tagged_context
+        sites_tagged_context,
+        sites_stats_filt,
+        sample_site_depth
     )
 
     emit:

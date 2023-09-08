@@ -87,7 +87,12 @@ workflow ADARRADAR {
         M03_SAMDEPTH.out.sample_site_depth
     )
 
-    M04_REPORT.out.view { "report generated: $it" }
-
 }
 
+workflow.onComplete { 
+    log.info( 
+        workflow.success ? 
+            "\nOutputs written to: ${file(params.outdir).toAbsolutePath()}\n\nADAR-RADAR completed sucessfully." : 
+            "\nADAR-RADAR failed."
+    )
+}

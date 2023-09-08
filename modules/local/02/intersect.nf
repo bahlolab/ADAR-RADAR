@@ -4,6 +4,7 @@ process INTERSECT {
     memory '4 GB'
     time   '2 h'
     label  'R'
+    publishDir "${params.outdir}/rds", pattern: '*.rds', mode: 'copy'
 
     input:
     path sites_redi_join 

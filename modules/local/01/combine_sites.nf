@@ -4,13 +4,14 @@ process COMBINE_SITES {
     memory '4 GB'
     time   '2 h'
     label  'R'
+    publishDir "${params.outdir}/rds", pattern: '*.rds', mode: 'copy'
 
     input:
     path(jacusa_tables)
     path(redi_counts)
 
     output:
-    path "${params.name}.stranded_edSites.bed.gz",   emit: edsites_bed
+    path "${params.name}.stranded_edSites.bed.gz", emit: edsites_bed
     path "${params.name}.res_other.rds",          emit: res_other
     path "${params.name}.nSamp_site_counts.rds",  emit: samp_site_counts
     path "${params.name}.siteStats_rediJOIN.rds", emit: sites_redi_join
