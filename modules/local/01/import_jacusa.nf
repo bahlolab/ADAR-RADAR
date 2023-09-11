@@ -1,7 +1,7 @@
 
 process IMPORT_JACUSA {
     cpus    1
-    memory '4 GB'
+    memory '8 GB'
     time   '1 h'
     label  'R'
     tag "$id"

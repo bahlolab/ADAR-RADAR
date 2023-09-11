@@ -4,9 +4,11 @@ include { MARK_DUPS    } from '../../modules/local/00/mark_dups.nf'
 include { JACUSA       } from '../../modules/local/00/jacusa.nf'
 
 // TBD: replace with new
-ref_genome      = Channel.fromPath("$projectDir/resources/Homo_sapiens_assembly38.fasta", checkIfExists:true).first()
+ref_fasta       = Channel.fromPath("$projectDir/resources/hg38.fa.bgz", checkIfExists:true).first()
+ref_fasta_files = Channel.fromPath("$projectDir/resources/hg38.fa.bgz.*").collect()
 star_genome_dir = Channel.fromPath("$projectDir/resources/star-index-hg38", checkIfExists:true).first()
 star_gtf        = Channel.fromPath("$projectDir/resources/gencode.v43.annotation.gtf", checkIfExists:true).first()
+regions_bed     = Channel.fromPath("$projectDir/resources/hg38_calling_regions.bed", checkIfExists:true).first()
 jacus_jar       = Channel.fromPath("$projectDir/resources/JACUSA_v1.3.5.jar", checkIfExists:true).first()
 
 workflow M00_PREPROCESS {
@@ -23,13 +25,15 @@ workflow M00_PREPROCESS {
 
     MARK_DUPS (
         STAR_2_PASS.out,
-        ref_genome
+        ref_fasta,
+        ref_fasta_files
     )
 
     bams_mix = bams.mix(MARK_DUPS.out)
 
     JACUSA(
         bams_mix,
+        regions_bed,
         jacus_jar
     )
 

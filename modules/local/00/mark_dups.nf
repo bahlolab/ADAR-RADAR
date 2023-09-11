@@ -10,7 +10,8 @@ process MARK_DUPS {
 
     input:
     tuple val(sample), path(in_bam)
-    path ref_genome
+    path ref_fasta
+    path ref_fasta_files
 
     output:
     tuple val(sample), path(out_bam), path("${out_bam}.bai")
@@ -18,14 +19,17 @@ process MARK_DUPS {
     script:
     out_bam = "${sample}.md.bam"
     """
-    samtools index -@ $task.cpus $in_bam
+    mkdir tmp
 
     MarkDuplicates \\
+        TMP_DIR=tmp \\
         I=$in_bam \\
         O=tmp.bam \\
         M=${sample}_duplication_info
     
-    samtools calmd -@ $task.cpus -b tmp.bam $ref_genome > $out_bam
+    samtools calmd -@ $task.cpus -b tmp.bam $ref_fasta > $out_bam
+
+    rm tmp.bam tmp -r
     
     samtools index -@ $task.cpus $out_bam
     """

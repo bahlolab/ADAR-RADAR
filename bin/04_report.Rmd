@@ -38,7 +38,7 @@ my_datatable <- function(data) {
 
 
 ```{r}
-# res_other <- readRDS('/vast/scratch/users/munro.j/nextflow/work/f1/f0754ae9d82d62786b905d2653c53f/AR.res_other.rds')
+# res_other <- readRDS('/vast/scratch/users/munro.j/nextflow/work/62/4a65ff4673ae14163f8494d9eabeda/tsc_tuber_cohort.res_other.rds')
 
 basechange_freq <-
   res_other %>% 
@@ -55,7 +55,7 @@ basechange_freq %>%
   ggplot(aes(alt_base, ref_base)) +
   theme_minimal() +
   theme(panel.grid = element_blank()) +
-  geom_tile(aes(fill = percent)) +
+  geom_tile(aes(fill = percent), col = 'black') +
   ggfittext::geom_fit_text(aes(label = label), contrast = T) +
   scale_fill_viridis_c(trans = 'log1p') +
   ggtitle('Detected RNA Basechange Frequencies',
@@ -65,31 +65,29 @@ my_datatable(basechange_freq)
 ```
 
 ```{r}
-is_outlier <- function(x) (x < quantile(x, 0.25) - 1.5 * IQR(x)) |  (x > quantile(x, 0.75) + 1.5 * IQR(x))
+# is_outlier <- function(x) (x < quantile(x, 0.25) - 1.5 * IQR(x)) |  (x > quantile(x, 0.75) + 1.5 * IQR(x))
 
 sample_basechange <-
   res_other %>% 
-  select(region, position, basechange, sample,) %>% 
+  select(region, position, basechange, sample) %>% 
   distinct() %>% 
   na.omit() %>% 
   group_by(sample) %>%
   summarise(n_sites = n(),
             n_sites_AG = sum(basechange == 'A->G'),
             percent_AG = round(100*n_sites_AG/n_sites,2),
-            .groups = 'drop') %>% 
+            .groups = 'drop')
   # add_row(sample = 'outer', n_sites = 8000,n_sites_AG=2000, freq_AG = 0.25) %>%
-  mutate(outlier = is_outlier(percent_AG))
+  # mutate(outlier = is_outlier(percent_AG))
+
 
 sample_basechange %>% 
   ggplot(aes(n_sites, n_sites_AG)) +
-  geom_smooth(method = 'lm',) +
-  geom_point(alpha = 0.5) +
-  geom_point(
-    data = filter(sample_basechange, outlier),
-    aes(col = outlier)) +
-  ggrepel::geom_text_repel(
-    data = filter(sample_basechange, outlier),
-    aes(label = sample)) +
+  geom_smooth(method = 'lm', col = 'gray25') +
+  geom_point(aes(col = percent_AG)) +
+  scale_color_viridis_c() +
+  scale_x_continuous(trans = 'log10') +
+  scale_y_continuous(trans = 'log10') +
   labs(x = 'number of basechange sites',
        y = 'number of A->G sites',
        title = 'RNA basechange sites counts across samples')
@@ -98,7 +96,7 @@ my_datatable(sample_basechange)
 ```
 
 ```{r}
-# sample_site_depth <- readRDS('/vast/scratch/users/munro.j/nextflow/work/3e/5748a46c60bf80520039a6dbbb66ce/AR.sample_site_depth.rds')
+# sample_site_depth <- readRDS('/vast/scratch/users/munro.j/nextflow/work/62/4a65ff4673ae14163f8494d9eabeda/tsc_tuber_cohort.sample_site_depth.rds')
 n_sites <- n_distinct(sample_site_depth$siteID)
 
 sample_site_smry <-
@@ -112,13 +110,27 @@ sample_site_smry <-
 sample_site_smry %>% 
   ggplot(aes(mean_sam_depth, mean_jac_depth)) +
   geom_abline() +
-  geom_point(aes(col = call_rate)) +
+  geom_point() +
   coord_fixed() +
   scale_color_viridis_c(end = 0.85) +
-  ggtitle('JACUSA depth vs Sam Depth vs Call-Rate')
+  ggtitle('JACUSA depth vs Sam Depth')
 # +
   # scale_x_continuous(trans = 'log') +
   # scale_y_continuous(trans = 'log')
+```
+```{r}
+library(ggforce)
+
+
+sample_basechange %>% 
+  select(sample, n_sites, n_sites_AG, percent_AG) %>% 
+  left_join(sample_site_smry) %>% 
+  ggplot(aes(x = .panel_x, y = .panel_y)) +
+  geom_smooth(method = 'lm') +
+  # geom_point(aes(col = sample), show.legend = F, size = 0.5) +
+  geom_point(alpha = 0.5, size = 0.75) +
+  geom_autodensity() +
+  facet_matrix(vars(n_sites, percent_AG, mean_sam_depth, call_rate), layer.diag = 3)
 ```
 
 ### Editing Site Context Summary

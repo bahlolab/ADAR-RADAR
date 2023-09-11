@@ -10,7 +10,12 @@ params.depth_thresh = 10
 params.remove_chr = true
 
 // TODO:
-// params.strandedness = 'stranded'
+params.strand = 'RF-FIRSTSTRAND' // 'RF-FIRSTSTRAND', 'FR-SECONDSTRAND' or 'UNSTRANDED'
+
+ // check params.strand
+if (!['RF-FIRSTSTRAND', 'FR-SECONDSTRAND', 'UNSTRANDED'].contains(params.strand)) {
+    error("params.strand must be one of 'RF-FIRSTSTRAND', 'FR-SECONDSTRAND' or  'UNSTRANDED'")
+}
 
 include { ADARRADAR } from './workflows/adarradar'
 

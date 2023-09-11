@@ -22,7 +22,7 @@ process COMBINE_SITES {
     01_combine_sites.R \\
         $params.name \\
         $redi_counts \\
-        $jacusa_tables \\
-        $params.sample_thresh
+        $params.sample_thresh \\
+        $jacusa_tables
     """
 }

@@ -9,7 +9,8 @@ process JACUSA {
 
     input:
     tuple val(sample), path(bam), path(bai)
-    path jacusa_jar
+    path(bed)
+    path(jacusa_jar)
 
     output:
     tuple val(sample), path(output)
@@ -18,8 +19,9 @@ process JACUSA {
     output = "${sample}_jacusa_strnd1.out"
     """
     java -jar $jacusa_jar call-1 $bam \\
+        -b $bed \\
         -F 1024 \\
-        -P RF-FIRSTSTRAND \\
+        -P $params.strand \\
         -a D,S,Y \\
         -p $task.cpus \\
         -r $output
