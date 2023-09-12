@@ -7,10 +7,14 @@ name <- args[1]
 redi_counts <- args[2]
 # TODO - update to frequency + count for applicability to small batches
 sample_thresh <- as.integer(args[3])
-jacusa_tables <- args[4:length(args)]
+# minimum detection filter: read depth for alternate (i.e., edited) allele
+altCount_thresh <- as.integer(args[4])
+# minimum detection filter: total read depth across candidate edited site
+DP_thresh <- as.integer(args[5])
+jacusa_tables <- args[6:length(args)]
 
 res_other <- map_df(jacusa_tables, readRDS)
-# moved to jacusa_helper
+# moved to import jacusa
 # filter(nchar(basechange) == 4) %>%
 # filter(flagINFO == "*") %>%
 # filter(altcount >= altCount_thresh) %>%
@@ -26,26 +30,37 @@ saveRDS(
 all_siteStats <-
   res_other %>%
   # filter(siteID %in% (nSamp_site_counts %>% filter(n>=3) %>% pull(siteID))) %>%
-  filter(basechange %in% c("A->G")) %>% # stranded data
-  # filter(basechange %in% c('A->G','T->C')) %>%  #unstranded data
+  filter(
+    basechange %in% c("A->G", "T->C"),# stranded data
+    # basechange %in% c('A->G','T->C'),# unstranded
+    altcount >= altCount_thresh,
+    totalDP >= DP_thresh,
+  ) %>% 
   group_by(siteID, basechange, strand) %>% # stranded
   # group_by(siteID,basechange) %>%  #unstranded
   summarize(
-    meanAP = mean(altprop), medianAP = median(altprop), sdAP = sd(altprop),
-    meanAD = mean(altcount), medianAD = median(altcount), sdAD = sd(altcount),
+    meanAP = mean(altprop),
+    medianAP = median(altprop),
+    sdAP = sd(altprop),
+    meanAD = mean(altcount),
+    medianAD = median(altcount),
+    sdAD = sd(altcount),
     nSamples = n()
-  ) %>% ungroup()
+  ) %>%
+  ungroup()
 
 saveRDS(
   all_siteStats,
   str_c(name, ".all_siteStats.rds")
 )
 
-
-
 nSamp_site_counts <-
   res_other %>%
-  filter(basechange %in% c("A->G", "T->C")) %>%
+  filter(
+    basechange %in% c("A->G", "T->C"),
+    altcount >= altCount_thresh,
+    totalDP >= DP_thresh,
+  ) %>%
   count(siteID)
 
 saveRDS(
@@ -55,7 +70,7 @@ saveRDS(
 
 forSamDepth <-
   nSamp_site_counts %>%
-  filter(n >= sample_thresh) %>% # filter siteID by prevalence in at least 10 of N samples
+  filter(n >= sample_thresh) %>% # filter siteID by prevalence in at least sample_thresh
   select(siteID) %>%
   distinct() %>%
   separate(siteID, into = c("chr", "pos"), convert = TRUE, sep = "_") %>%
@@ -86,8 +101,12 @@ siteStats_rediJOIN <-
   ) %>% # stranded data
   # group_by(siteID,basechange) %>%  #unstranded data
   summarize(
-    meanAP = mean(altprop), medianAP = median(altprop), sdAP = sd(altprop),
-    meanAD = mean(altcount), medianAD = median(altcount), sdAD = sd(altcount),
+    meanAP = mean(altprop),
+    medianAP = median(altprop), 
+    sdAP = sd(altprop),
+    meanAD = mean(altcount),
+    medianAD = median(altcount), 
+    sdAD = sd(altcount),
     nSamples = n()
   ) %>%
   ungroup() %>%
@@ -96,9 +115,7 @@ siteStats_rediJOIN <-
     readRDS(redi_counts),
     by = "siteID"
   ) %>%
-  group_by(
-    siteID
-  ) %>%
+  group_by(siteID) %>%
   filter(
     !(n() > 1 & is.na(chromosome))
   ) %>%

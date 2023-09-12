@@ -8,9 +8,9 @@ name <- args[1]
 siteStats_filt_fn <- args[2]
 sam_depth_csv_fn <- args[3]
 res_other_fn <- args[4]
-DP_thresh <- as.integer(args[5])
-altCount_thresh <- as.integer(args[6])
-remove_chr <- as.logical(args[7])
+# DP_thresh <- as.integer(args[5])
+# altCount_thresh <- as.integer(args[6])
+remove_chr <- as.logical(args[5])
 
 
 siteStats_filt <- readRDS(siteStats_filt_fn)
@@ -36,16 +36,16 @@ saveRDS(sam_depth, str_c(name, '.sam_depth_qQ20.rds'))
 sam_depth_subset <-
   sam_depth %>% 
   semi_join(res_other, 'sample') %>% 
-  semi_join(siteStats_filt, 'siteID') %>% 
-  filter(samDepth >= DP_thresh)
+  semi_join(siteStats_filt, 'siteID')
+  # filter(samDepth >= DP_thresh)
 
 # renamed from y_subset
 res_other_subset <- 
   res_other %>% 
   filter(
     flagINFO=='*',
-    totalDP >= DP_thresh,
-    altcount >= altCount_thresh,
+    # totalDP >= DP_thresh,
+    # altcount >= altCount_thresh,
     #basechange %in% c('A->G','T->C'), #toggle for unstranded data
     # basechange %in% c('A->G')
     ) %>% 

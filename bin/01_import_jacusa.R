@@ -9,11 +9,11 @@ sample <- args[1]
 jacusa_output <- args[2]
 dbSNP_loci_fn <- args[3]
 # minimum detection filter: read depth for alternate (i.e., edited) allele
-altCount_thresh <- as.integer(args[4])
+# altCount_thresh <- as.integer(args[4]) -- filter this later
 # minimum detection filter: total read depth across candidate edited site
-DP_thresh <- as.integer(args[5])
+# DP_thresh <- as.integer(args[5]) -- filter this later
 # remove 'chr' prefix from hg38 coordinates
-remove_chr <- as.logical(args[6])
+remove_chr <- as.logical(args[4])
 
 # Based on code written by Simon N Thomas (UROP student)
 
@@ -61,9 +61,9 @@ res <-
   )  %>% 
   filter(nchar(basechange) == 4) %>%
   filter(flagINFO == "*") %>%
-  filter(altcount >= altCount_thresh) %>%
-  mutate(totalDP = altcount * (1 / altprop)) %>%
-  filter(totalDP >= DP_thresh) %>%
+  # filter(altcount >= altCount_thresh) %>%
+  mutate(totalDP = as.integer(round(altcount * (1 / altprop)))) %>%
+  # filter(totalDP >= DP_thresh) %>%
   mutate(region = `if`(remove_chr, str_remove(region, '^chr'), region)) %>%
   mutate(siteID = paste(region, position, sep = "_"))
 

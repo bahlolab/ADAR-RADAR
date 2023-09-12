@@ -23,6 +23,8 @@ process COMBINE_SITES {
         $params.name \\
         $redi_counts \\
         $params.sample_thresh \\
+        $params.alt_count_thresh \\
+        $params.depth_thresh \\
         $jacusa_tables
     """
 }

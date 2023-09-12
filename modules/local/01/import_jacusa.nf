@@ -19,8 +19,8 @@ process IMPORT_JACUSA {
         $id \\
         $jacusa_output \\
         $dbsnp \\
-        $params.alt_count_thresh \\
-        $params.depth_thresh \\
         $params.remove_chr
     """
+        // $params.alt_count_thresh \\
+        // $params.depth_thresh \\
 }

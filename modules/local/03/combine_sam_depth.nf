@@ -22,8 +22,8 @@ process COMBINE_SAM_DEPTH {
         $sites_stats_filt \\
         $sam_depth_csv \\
         $res_other \\
-        $params.depth_thresh \\
-        $params.alt_count_thresh \\
         $params.remove_chr
     """
+        // $params.depth_thresh \\
+        // $params.alt_count_thresh \\
 }
