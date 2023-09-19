@@ -37,7 +37,8 @@ workflow M00_PREPROCESS {
         jacus_jar
     )
 
-    bamdir = file("${params.outdir}/bam").with{ it.mkdir(); it}.toRealPath()
+
+    bamdir = file("${params.outdir}/bam").with{ it.mkdirs(); it}.toRealPath()
 
     // create bam manifest
     MARK_DUPS.out
@@ -54,7 +55,7 @@ workflow M00_PREPROCESS {
 
 
     // create jacusa manifest
-    jacusadir = file("${params.outdir}/jacusa").with{ it.mkdir(); it}.toRealPath()
+    jacusadir = file("${params.outdir}/jacusa").with{ it.mkdirs(); it}.toRealPath()
     JACUSA.out
         .map { 
             sm, out -> "$sm,$jacusadir/${out.fileName}" 
