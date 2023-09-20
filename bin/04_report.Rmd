@@ -32,13 +32,15 @@ my_datatable <- function(data) {
         "}"
       )))
 }
+
 ```
 
 ## Basechange QC metrics
 
 
 ```{r}
-# res_other <- readRDS('/vast/scratch/users/munro.j/nextflow/work/62/4a65ff4673ae14163f8494d9eabeda/tsc_tuber_cohort.res_other.rds')
+
+n_sites <- n_distinct(sample_site_depth$siteID)
 
 basechange_freq <-
   res_other %>% 
@@ -59,7 +61,7 @@ basechange_freq %>%
   ggfittext::geom_fit_text(aes(label = label), contrast = T) +
   scale_fill_viridis_c(trans = 'log1p') +
   ggtitle('Detected RNA Basechange Frequencies',
-          subtitle = str_c(format(nrow(basechange_freq), big.mark = ','), ' sites'))
+          subtitle = str_c(format(n_sites, big.mark = ','), ' sites'))
 
 my_datatable(basechange_freq)
 ```
@@ -83,7 +85,8 @@ sample_basechange <-
 
 sample_basechange %>% 
   ggplot(aes(n_sites, n_sites_AG)) +
-  geom_smooth(method = 'lm', col = 'gray25') +
+  geom_abline() +
+  geom_smooth(method = 'lm') +
   geom_point(aes(col = percent_AG)) +
   scale_color_viridis_c() +
   scale_x_continuous(trans = 'log10') +
@@ -92,12 +95,9 @@ sample_basechange %>%
        y = 'number of A->G sites',
        title = 'RNA basechange sites counts across samples')
 
-my_datatable(sample_basechange)
 ```
 
 ```{r}
-# sample_site_depth <- readRDS('/vast/scratch/users/munro.j/nextflow/work/62/4a65ff4673ae14163f8494d9eabeda/tsc_tuber_cohort.sample_site_depth.rds')
-n_sites <- n_distinct(sample_site_depth$siteID)
 
 sample_site_smry <-
   sample_site_depth %>% 
@@ -105,7 +105,7 @@ sample_site_smry <-
   summarise(
     mean_sam_depth = mean(samDepth),
     mean_jac_depth = mean(totalDP),
-    call_rate = n()/n_sites) 
+    call_rate = sum(altcount > 0)/n_sites) 
 
 sample_site_smry %>% 
   ggplot(aes(mean_sam_depth, mean_jac_depth)) +
@@ -118,19 +118,24 @@ sample_site_smry %>%
   # scale_x_continuous(trans = 'log') +
   # scale_y_continuous(trans = 'log')
 ```
+
 ```{r}
 library(ggforce)
 
-
-sample_basechange %>% 
+sample_summary <-
+  sample_basechange %>% 
   select(sample, n_sites, n_sites_AG, percent_AG) %>% 
-  left_join(sample_site_smry) %>% 
+  left_join(sample_site_smry)
+
+sample_summary %>% 
   ggplot(aes(x = .panel_x, y = .panel_y)) +
   geom_smooth(method = 'lm') +
   # geom_point(aes(col = sample), show.legend = F, size = 0.5) +
   geom_point(alpha = 0.5, size = 0.75) +
   geom_autodensity() +
   facet_matrix(vars(n_sites, percent_AG, mean_sam_depth, call_rate), layer.diag = 3)
+
+my_datatable(sample_summary)
 ```
 
 ### Editing Site Context Summary
@@ -177,5 +182,71 @@ sites_stats_filt %>%
   ggtitle('Repeat Masker type vs REDI annotation type')
 ```
 
+```{r}
+site_mean_smry <-
+  sample_site_depth %>% 
+  group_by(siteID) %>% 
+  summarise(mean_depth = mean(samDepth),
+            mean_altprop = mean(altprop),
+            .groups = 'drop')
 
+site_mean_smry %>% 
+  left_join(
+    sites_stats_filt %>%
+      select(siteID, RM_repType) %>% 
+      distinct()
+  ) %>% 
+  ggplot(aes(RM_repType, mean_altprop, col = RM_repType),) +
+  geom_violin(show.legend=F) +
+  geom_boxplot(width = 0.1, outlier.color = NA,  show.legend=F)
+
+
+```
+
+```{r}
+top_biotype <-
+  sites_stats_filt %>% 
+  count(RM_repType, sort =T)
+
+sites_stats_filt %>%
+  filter(str_detect(site_status, 'single')) %>%
+  filter(ENSGbioType == 'protein_coding') %>%
+  count(REDI, RM_repType) %>%
+  mutate(prop = n / sum(n)) %>%
+  mutate(cs = cumsum(prop)) %>%
+  ggplot(aes(x = REDI, y = n, fill = RM_repType)) +
+  geom_col(position ='dodge') +
+  ggtitle('Repeat Masker type vs REDI annotation type')
+
+sites_stats_filt %>%
+  filter(str_detect(site_status, 'single') | is.na(ENSGbioType)) %>%
+  count(ENSGbioType) %>% 
+  arrange(n) %>% 
+  mutate(ENSGbioType = replace_na(ENSGbioType, 'unannotated') %>% 
+           as_factor()) %>% 
+  ggplot(aes(ENSGbioType, n)) +
+  geom_col(aes(fill = ENSGbioType), show.legend = F) +
+  coord_flip() +
+  ggtitle('biotype counts')
+
+sites_stats_filt %>%
+  filter(str_detect(site_status, 'single') | is.na(ENSGbioType)) %>%
+  count(ENSGbioType, sort = T) %>% 
+  slice(1:5) %>% 
+  select(-n) %>% 
+  left_join(
+    sites_stats_filt %>% 
+      filter(str_detect(site_status, 'single') | is.na(ENSGbioType)) %>% 
+      select(siteID, ENSGbioType) %>% 
+      distinct(),
+    by = 'ENSGbioType'
+  ) %>% 
+  mutate(ENSGbioType = replace_na(ENSGbioType, 'unannotated')) %>% 
+  left_join(
+    site_mean_smry,
+    by = 'siteID') %>% 
+  ggplot(aes(ENSGbioType, mean_altprop, col = ENSGbioType),) +
+  geom_violin(show.legend=F) +
+  geom_boxplot(width = 0.1, outlier.color = NA,  show.legend=F)
+```
 
